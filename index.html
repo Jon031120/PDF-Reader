@@ -2089,6 +2089,8 @@ function finishRegionDraft(){
   reassignRegionMarkups();
   selectRegion(r.id);
   setTool('select');
+  drawOverlay();            // render the new region box + refresh the sidebar region list
+  updateSidebar();
   setHint('Detail "'+r.title+'" added — set its own scale with the scale box, Calibrate, or Auto while it’s selected');
 }
 function deleteRegion(id){
