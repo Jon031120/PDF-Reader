@@ -58,11 +58,13 @@
   #dockDivider{display:none; position:fixed; top:35px; bottom:0; width:6px; z-index:6; cursor: col-resize; background:transparent;}
   body.mode-split #dockDivider{display:block; right:calc(var(--dockW) - 3px);}
   #dockDivider:hover{background:var(--green);}
+  body.no-uv .ms-btn[data-mode="uval"], body.no-uv .ms-btn[data-mode="split"], body.no-uv #msLock, body.no-uv .tb-named.acc-mat, body.no-uv #expBuildup, body.no-uv #mkAssignMat, body.no-uv #sbBuildup, body.no-uv #selMaterial, body.no-uv #selSuggest, body.no-uv #dimGuided{display:none !important;}
   /* docked (split) calculator: single scrolling column so it stays usable when narrow */
   body.mode-split .uv-body{flex-direction:column; overflow-y:auto;}
   body.mode-split .uv-left{flex:none; border-right:none; border-bottom:1px solid var(--border); overflow:visible;}
   body.mode-split .uv-right{flex:none; overflow:visible;}
-  body.mode-split .uv-sectionwrap{max-width:340px;}
+  body.mode-split .uv-sectionwrap{max-width:100%;}
+  body.mode-split #uvSection svg{width:100%;max-width:420px;margin:0 auto;}
 
   /* ---------- Toolbar ---------- */
   #toolbar{display:flex; align-items:center; gap:6px; padding:8px 12px; background:var(--panel); border-bottom:1px solid var(--border); flex-wrap:wrap; user-select:none;}
@@ -943,6 +945,8 @@
     <div class="set-panel" data-tab="general">
     <div class="set-group">Guidance</div>
     <label class="set-row"><input type="checkbox" id="setHints"> Show the hints box <span class="set-note">(the “next step” tip with a “Show me” button, bottom-left)</span></label>
+    <div class="set-group">Tools</div>
+    <label class="set-row"><input type="checkbox" id="setUvEnabled"> U-value &amp; condensation tools <span class="set-note">(turn off for a plain PDF reader — hides the calculator, Split view, material &amp; build-up tagging and related buttons)</span></label>
     <div class="set-group">Navigation &amp; input</div>
     <div class="set-row" style="display:flex;align-items:center;gap:8px">Pointing device
       <select id="setInput" style="flex:1">
@@ -1101,7 +1105,6 @@
             <label>Wall thickness w (m)<input type="number" id="uvWallThk" value="0.3" step="0.01"></label>
           </div>
           <div class="uv-parow"><span class="uv-palabel">P/A ratio</span><input type="range" id="uvPAr" min="0.2" max="1.2" step="0.01" value="0.5"><span class="uv-pahint">auto-set from P ÷ A — drag to override</span></div>
-          <div class="uv-padiag"><svg viewBox="0 0 260 120" xmlns="http://www.w3.org/2000/svg"><rect x="172" y="22" width="62" height="76" fill="#eef1f4" stroke="#cfd6dd"/><text x="203" y="56" font-size="8" fill="#8a94a0" text-anchor="middle">heated</text><text x="203" y="67" font-size="8" fill="#8a94a0" text-anchor="middle">neighbour</text><rect x="22" y="22" width="150" height="76" fill="#dff0d6"/><text x="97" y="58" font-size="12" fill="#33502a" text-anchor="middle" font-weight="700">A</text><text x="97" y="72" font-size="8" fill="#5b6671" text-anchor="middle">heated floor area</text><line x1="22" y1="22" x2="172" y2="22" stroke="#e05c5c" stroke-width="3.5"/><line x1="22" y1="22" x2="22" y2="98" stroke="#e05c5c" stroke-width="3.5"/><line x1="22" y1="98" x2="172" y2="98" stroke="#e05c5c" stroke-width="3.5"/><line x1="172" y1="22" x2="172" y2="98" stroke="#8a9bab" stroke-width="2.5" stroke-dasharray="5 3"/><text x="22" y="16" font-size="8.5" fill="#e05c5c">P = exposed perimeter (red edges)</text><text x="178" y="105" font-size="7.5" fill="#8a9bab">party wall (excluded)</text></svg><div class="uv-pacap"><b>A</b> = heated floor area (to inside face of external walls). <b>P</b> = total length of edges to the <b style="color:#c0392b">outside or an unheated space</b> only — exclude party walls to heated neighbours (grey dashed). Higher P/A → higher floor U-value.</div></div>
           <div id="uvSuspBox" style="display:none">
             <div class="uv-grid" style="margin-top:7px">
               <label>Void height above ground (m)<input type="number" id="uvVoidH" value="0.3" step="0.05"></label>
@@ -3968,7 +3971,7 @@ $('btnAutoScale').addEventListener('click', async ()=>{
 
 /* ---------- Settings (persisted) ---------- */
 const SETTINGS_KEY='brs-pdf-reader-settings';
-const DEFAULT_SETTINGS={ autoScale:true, askMultiScale:true, snapOn:true, wheelZoom:false, wheelSens:0.0011, defColor:'#5fb346', defWidth:2, defFont:13, colorByTag:false, tagColors:{}, input:'mouse', assessor:{}, reportLogo:null, reportColor:'#1f3d14',
+const DEFAULT_SETTINGS={ autoScale:true, askMultiScale:true, snapOn:true, wheelZoom:false, wheelSens:0.0011, defColor:'#5fb346', defWidth:2, defFont:13, colorByTag:false, tagColors:{}, input:'mouse', uvEnabled:true, assessor:{}, reportLogo:null, reportColor:'#1f3d14',
   summary:{len:true, area:true, perim:true, count:true}, mkCols:{len:true, mat:true}, hints:true };
 // show/hide the four summary stat cards per settings
 function applySummaryCards(){
@@ -4007,6 +4010,8 @@ function applySettings(){
   const bh=$('btnHints'); if(bh) bh.classList.toggle('active', settings.hints!==false);
   if (typeof updateHintBox==='function') updateHintBox();
   if (snap.on && state.pdfDoc) buildSnapPoints();
+  document.body.classList.toggle('no-uv', settings.uvEnabled===false);
+  if(settings.uvEnabled===false && (document.body.classList.contains('mode-uval')||document.body.classList.contains('mode-split')) && typeof switchToPdf==='function') switchToPdf();
 }
 function loadSettings(){
   try{ Object.assign(settings, JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}')); }catch(e){}
@@ -4018,6 +4023,7 @@ function syncSettingsUI(){
   const sm=settings.summary||{}; $('setSumLen').checked=sm.len!==false; $('setSumArea').checked=sm.area!==false; $('setSumPerim').checked=sm.perim!==false; $('setSumCount').checked=sm.count!==false;
   const mc=settings.mkCols||{}; $('setColLen').checked=mc.len!==false; $('setColMat').checked=mc.mat!==false;
   $('setHints').checked=settings.hints!==false;
+  if($('setUvEnabled')) $('setUvEnabled').checked=settings.uvEnabled!==false;
   $('setInput').value=settings.input||'mouse';
   $('setSnap').checked=settings.snapOn;
   $('setWheel').checked=settings.wheelZoom;
@@ -4072,6 +4078,7 @@ const bindSum=(id,obj,key)=>$(id).addEventListener('change',e=>{ settings[obj]=s
 bindSum('setSumLen','summary','len'); bindSum('setSumArea','summary','area'); bindSum('setSumPerim','summary','perim'); bindSum('setSumCount','summary','count');
 bindSum('setColLen','mkCols','len'); bindSum('setColMat','mkCols','mat');
 $('setHints').addEventListener('change',e=>{ settings.hints=e.target.checked; saveSettings(); $('btnHints').classList.toggle('active', settings.hints!==false); updateHintBox(); });
+$('setUvEnabled').addEventListener('change',e=>{ settings.uvEnabled=e.target.checked; saveSettings(); applySettings(); });
 $('setColorByTag').addEventListener('change',e=>{
   settings.colorByTag=e.target.checked; saveSettings();
   if (settings.colorByTag) state.markups.forEach(m=>applyTagColor(m));
@@ -4307,7 +4314,7 @@ function addMaterialNote(m){
 }
 let matPickCb=null;
 function pickMaterial(cb){ matPickCb=cb; openMaterials(); }
-function openMaterials(){ $('matBack').classList.add('open'); $('matSearch').value=''; $('matAddForm').style.display='none'; renderMatResults(); setTimeout(()=>$('matSearch').focus(),50); }
+function openMaterials(){ if(settings&&settings.uvEnabled===false) return; $('matBack').classList.add('open'); $('matSearch').value=''; $('matAddForm').style.display='none'; renderMatResults(); setTimeout(()=>$('matSearch').focus(),50); }
 
 /* ---------- Multi-select build-up workflow ---------- */
 function updateSelBar(){
@@ -5034,8 +5041,8 @@ function updateModeLock(){
   $('msLock').style.display=u?'none':'inline';
 }
 function setActiveMode(m){ document.querySelectorAll('.ms-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===m)); }
-function switchToUval(){ if(!uvUnlocked()){ flashDefineRegion(); setHint('Define a working space first — use the highlighted Detail region tool (E) to draw a box around the detail.'); return; } document.body.classList.remove('mode-split'); document.body.classList.add('mode-uval'); setActiveMode('uval'); openUval(); }
-function switchToSplit(){ if(!uvUnlocked()){ flashDefineRegion(); setHint('Define a working space first — use the highlighted Detail region tool (E) to draw a box around the detail.'); return; } document.body.classList.remove('mode-uval'); document.body.classList.add('mode-split'); setActiveMode('split'); openUval(); if(state.pdfDoc) setTimeout(fitWidth,40); }
+function switchToUval(){ if(settings&&settings.uvEnabled===false) return; if(!uvUnlocked()){ flashDefineRegion(); setHint('Define a working space first — use the highlighted Detail region tool (E) to draw a box around the detail.'); return; } document.body.classList.remove('mode-split'); document.body.classList.add('mode-uval'); setActiveMode('uval'); openUval(); }
+function switchToSplit(){ if(settings&&settings.uvEnabled===false) return; if(!uvUnlocked()){ flashDefineRegion(); setHint('Define a working space first — use the highlighted Detail region tool (E) to draw a box around the detail.'); return; } document.body.classList.remove('mode-uval'); document.body.classList.add('mode-split'); setActiveMode('split'); openUval(); if(state.pdfDoc) setTimeout(fitWidth,40); }
 function switchToPdf(){ document.body.classList.remove('mode-uval','mode-split'); $('uvalBack').classList.remove('open'); setActiveMode('pdf'); updateHintBox(); if(state.pdfDoc) setTimeout(fitWidth,40); }
 document.querySelectorAll('.ms-btn').forEach(b=>b.addEventListener('click',()=>{ const m=b.dataset.mode; if(m==='uval')switchToUval(); else if(m==='split')switchToSplit(); else switchToPdf(); }));
 // dock divider drag
