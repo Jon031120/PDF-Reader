@@ -1041,7 +1041,8 @@
 <div id="matBack">
   <div id="matModal">
     <h2><em>Material λ</em> — thermal conductivity lookup</h2>
-    <input type="text" id="matSearch" placeholder="Type a product or material — e.g. Kingspan K103, EPS, blockwork…" autocomplete="off">
+    <input type="text" id="matSearch" placeholder="Search a product or material — e.g. Kingspan K103, EPS, blockwork…" autocomplete="off">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><select id="matCatFilter" style="flex:1;min-width:160px"><option value="">All categories</option></select><span id="matCount" style="font-size:11.5px;color:var(--text-dim)"></span></div>
     <div id="matResults"></div>
     <div id="matWeb"></div>
     <div id="matAddForm" style="display:none; gap:6px; flex-wrap:wrap; align-items:center; background:var(--panel2); border:1px solid var(--border); border-radius:8px; padding:8px 10px;">
@@ -1060,7 +1061,7 @@
 </div>
 
 <div id="hvacBack"><div id="hvacModal">
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><h2><em>HVAC</em> — systems &amp; equipment lookup <span style="font-size:10px;color:var(--text-dim);font-weight:400">build v69</span></h2><button id="hvacClose" style="background:none;border:none;color:var(--text-dim);font-size:22px;cursor:pointer;line-height:1">×</button></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><h2><em>HVAC</em> — systems &amp; equipment lookup <span style="font-size:10px;color:var(--text-dim);font-weight:400">build v70</span></h2><button id="hvacClose" style="background:none;border:none;color:var(--text-dim);font-size:22px;cursor:pointer;line-height:1">×</button></div>
   <div class="hvac-tabs" id="hvacTabs">
     <button class="hvac-tab active" data-group="all">All</button>
     <button class="hvac-tab" data-group="Heating">Heating</button>
@@ -4343,6 +4344,42 @@ const BUILTIN_MATERIALS=[
   {n:'Natural stone — general', l:2.00, c:'Masonry', aka:['stone wall','rubble stone']},
   {n:'Concrete brick', l:0.90, c:'Masonry', aka:['concrete brick']},
   {n:'Hollow concrete block (filled)', l:1.00, c:'Masonry', aka:['hollow block']},
+  /* ===== blockwork — aircrete (autoclaved aerated) ===== */
+  {n:'Aircrete — Thermalite Turbo (450 kg/m\u00b3)', l:0.11, c:'Masonry (aircrete)', rho:450, cp:1000, aka:['thermalite turbo','aircrete turbo','aac']},
+  {n:'Aircrete — Thermalite Shield / Smooth (600)', l:0.15, c:'Masonry (aircrete)', rho:600, cp:1000, aka:['thermalite shield','thermalite smooth','aircrete']},
+  {n:'Aircrete — Thermalite Hi-Strength 7 (750)', l:0.19, c:'Masonry (aircrete)', rho:750, cp:1000, aka:['thermalite hi-strength','aircrete high strength']},
+  {n:'Aircrete — Thermalite Party Wall (low \u03bb)', l:0.11, c:'Masonry (aircrete)', rho:450, cp:1000, aka:['thermalite party wall']},
+  {n:'Aircrete — H+H Celcon Standard Grade (600)', l:0.15, c:'Masonry (aircrete)', rho:600, cp:1000, aka:['celcon standard','h+h celcon']},
+  {n:'Aircrete — H+H Celcon Solar Grade (450)', l:0.11, c:'Masonry (aircrete)', rho:450, cp:1000, aka:['celcon solar']},
+  {n:'Aircrete — H+H Celcon Super Solar (400)', l:0.10, c:'Masonry (aircrete)', rho:400, cp:1000, aka:['celcon super solar']},
+  {n:'Aircrete — Tarmac Toplite Standard (600)', l:0.15, c:'Masonry (aircrete)', rho:600, cp:1000, aka:['toplite','tarmac toplite']},
+  {n:'Aircrete — Mannok/Quinn Lite (600)', l:0.13, c:'Masonry (aircrete)', rho:600, cp:1000, aka:['quinn lite','mannok lite']},
+  /* ===== blockwork — aggregate / dense ===== */
+  {n:'Concrete block — dense (1800)', l:1.13, c:'Masonry', rho:1800, cp:1000, aka:['dense block','dense aggregate block']},
+  {n:'Concrete block — dense (2000)', l:1.33, c:'Masonry', rho:2000, cp:1000, aka:['dense block 2000']},
+  {n:'Concrete block — dense (2300)', l:1.75, c:'Masonry', rho:2300, cp:1000, aka:['dense block 2300','heavy block']},
+  {n:'Concrete block — medium dense (1450)', l:0.54, c:'Masonry', rho:1450, cp:1000, aka:['medium dense block']},
+  {n:'Concrete block — medium dense (1350)', l:0.44, c:'Masonry', rho:1350, cp:1000, aka:['medium block 1350']},
+  /* ===== blockwork — lightweight aggregate ===== */
+  {n:'Lightweight block — Plasmor Stranlite', l:0.11, c:'Masonry (lightweight)', rho:1050, cp:1000, aka:['stranlite','plasmor']},
+  {n:'Lightweight block — Plasmor Aglite Ultima', l:0.15, c:'Masonry (lightweight)', rho:1150, cp:1000, aka:['aglite','plasmor aglite']},
+  {n:'Lightweight block — Lignacite', l:0.40, c:'Masonry (lightweight)', rho:1400, cp:1000, aka:['lignacite']},
+  {n:'Lightweight block — Fibolite', l:0.20, c:'Masonry (lightweight)', rho:1200, cp:1000, aka:['fibolite']},
+  {n:'Hemp-lime (hempcrete) cast', l:0.07, c:'Masonry (natural)', rho:330, cp:1500, aka:['hempcrete','hemp lime','hemp-lime']},
+  /* ===== insulation — natural / bio-based ===== */
+  {n:'Sheep wool — Thermafleece CosyWool', l:0.039, c:'Natural insulation', rho:25, cp:1800, aka:['cosywool','thermafleece cosywool','sheep wool']},
+  {n:'Sheep wool — Thermafleece Ultrawool', l:0.034, c:'Natural insulation', rho:30, cp:1800, aka:['ultrawool','thermafleece ultrawool','sheep wool']},
+  {n:'Sheep wool — Black Mountain NatuWool', l:0.039, c:'Natural insulation', rho:25, cp:1800, aka:['natuwool','black mountain','sheep wool']},
+  {n:'Wood fibre — Steico Flex 038', l:0.038, c:'Natural insulation', rho:50, cp:2100, aka:['steico flex','wood fibre batt']},
+  {n:'Wood fibre — Gutex Thermoflex', l:0.036, c:'Natural insulation', rho:50, cp:2100, aka:['gutex','thermoflex','wood fibre']},
+  {n:'Wood fibre — Pavatex Pavaflex', l:0.038, c:'Natural insulation', rho:55, cp:2100, aka:['pavatex','pavaflex','wood fibre']},
+  {n:'Wood fibre board — Steico Protect (rigid)', l:0.043, c:'Natural insulation', rho:265, cp:2100, aka:['steico protect','wood fibre board']},
+  {n:'Hemp insulation — Thermo-Hemp', l:0.040, c:'Natural insulation', rho:35, cp:1700, aka:['thermo-hemp','hemp batt']},
+  {n:'Hemp insulation — IndiNature IndiTherm', l:0.039, c:'Natural insulation', rho:40, cp:1700, aka:['indinature','inditherm','hemp']},
+  {n:'Flax insulation batt', l:0.038, c:'Natural insulation', rho:30, cp:1600, aka:['flax']},
+  {n:'Wood wool board (Heraklith)', l:0.090, c:'Natural insulation', rho:400, cp:2100, aka:['wood wool','heraklith','woodwool']},
+  {n:'Straw bale (laid flat)', l:0.067, c:'Natural insulation', rho:110, cp:1500, aka:['straw bale','strawbale']},
+  {n:'Expanded cork board (rigid)', l:0.040, c:'Natural insulation', rho:120, cp:1800, aka:['cork board','expanded cork']},
 ];
 // merged library = built-ins + an updatable materials.json (same folder) + your own saved entries
 let jsonMaterials=[];      // loaded from materials.json if present
@@ -4376,26 +4413,41 @@ function matSearch(q){
   }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,40).map(x=>x.m);
 }
 function renderMatResults(){
-  const q=$('matSearch').value;
+  const q=$('matSearch').value.trim();
+  const sel=$('matCatFilter'); const cat=sel?sel.value:'';
   const list=$('matResults'); list.innerHTML='';
-  const res=matSearch(q);
-  if (!q.trim()){ list.innerHTML='<div style="padding:14px;color:var(--text-dim);font-size:12.5px">Start typing a product name or material…</div>'; $('matWeb').innerHTML=''; return; }
-  res.forEach(m=>{
+  let res=allMaterials();
+  if(cat) res=res.filter(m=>(m.c||'').trim()===cat);
+  if(q){
+    const toks=q.toLowerCase().split(/\s+/);
+    res=res.map(m=>{ const hay=(m.n+' '+(m.c||'')+' '+((m.aka||[]).join(' '))).toLowerCase(); let sc=0; toks.forEach(t=>{ if(hay.includes(t)) sc+=(m.aka||[]).some(a=>a===t)?3:(m.n.toLowerCase().includes(t)?2:1); }); return {m,sc}; }).filter(x=>x.sc>0).sort((a,b)=>b.sc-a.sc).map(x=>x.m);
+  } else {
+    res=res.slice().sort((a,b)=>(a.c||'').localeCompare(b.c||'')||a.n.localeCompare(b.n));
+  }
+  if($('matCount')) $('matCount').textContent=res.length+' material'+(res.length===1?'':'s')+(cat?(' · '+cat):'')+(q?' · matching':'');
+  res.slice(0,3000).forEach(m=>{
     const d=document.createElement('div'); d.className='mat-item';
     const badge = m._custom ? ' <span style="font-size:9.5px;color:#e8a33d;border:1px solid #e8a33d;border-radius:6px;padding:0 5px">yours</span>' : '';
-    const action = matPickCb ? '<button class="madd" style="border-color:var(--green);color:var(--green)" title="Use this material">Use ✓</button>' : '<button class="madd" title="Drop a sticky note with this on the drawing">+ Note</button>';
+    const action = matPickCb ? '<button class="madd" style="border-color:var(--green);color:var(--green)" title="Use this material">Use \u2713</button>' : '<button class="madd" title="Drop a sticky note with this on the drawing">+ Note</button>';
     d.innerHTML=`<div class="mname"><div class="t">${escapeHtml(m.n)}${badge}</div><div class="c">${escapeHtml(m.c||'')}</div>${(m.rho||m.cp)?`<div class="c">${m.rho?('\u03c1 '+m.rho+' kg/m\u00b3'):''}${(m.rho&&m.cp)?' \u00b7 ':''}${m.cp?('c '+m.cp+' J/kgK'):''}</div>`:''}</div>
-      <div class="lam">${m.l} <span style="font-size:10px;font-weight:400;color:var(--text-dim)">W/m·K</span></div>
-      ${m._custom?'<button class="madd mdel" title="Delete your entry">✕</button>':''}
+      <div class="lam">${m.l} <span style="font-size:10px;font-weight:400;color:var(--text-dim)">W/m\u00b7K</span></div>
+      ${m._custom?'<button class="madd mdel" title="Delete your entry">\u2715</button>':''}
       ${action}`;
     d.querySelector('.madd:last-child').addEventListener('click',()=>{ if(matPickCb){ const cb=matPickCb; matPickCb=null; $('matBack').classList.remove('open'); cb(m); } else addMaterialNote(m); });
     const del=d.querySelector('.mdel');
-    if (del) del.addEventListener('click',()=>{ customMaterials=customMaterials.filter(x=>x.n.toLowerCase()!==m.n.toLowerCase()); saveCustomMaterials(); renderMatResults(); });
+    if (del) del.addEventListener('click',()=>{ customMaterials=customMaterials.filter(x=>x.n.toLowerCase()!==m.n.toLowerCase()); saveCustomMaterials(); renderMatCats(); renderMatResults(); });
     list.appendChild(d);
   });
-  if (!res.length) list.innerHTML='<div style="padding:14px;color:var(--text-dim);font-size:12.5px">Not in the built-in library — try the web search below.</div>';
-  const url='https://www.google.com/search?q='+encodeURIComponent(q.trim()+' thermal conductivity W/mK lambda datasheet');
-  $('matWeb').innerHTML=`<a href="${url}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Search the web for “${escapeHtml(q.trim())}” λ value</a>`;
+  if (!res.length) list.innerHTML='<div style="padding:14px;color:var(--text-dim);font-size:12.5px">'+(q?'Not in the library \u2014 try the web search below.':'No materials in this category.')+'</div>';
+  if(q){ const url='https://www.google.com/search?q='+encodeURIComponent(q+' thermal conductivity W/mK lambda datasheet');
+    $('matWeb').innerHTML=`<a href="${url}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Search the web for \u201c${escapeHtml(q)}\u201d \u03bb value</a>`;
+  } else { $('matWeb').innerHTML=''; }
+}
+function renderMatCats(){
+  const sel=$('matCatFilter'); if(!sel) return; const cur=sel.value;
+  const cats=[...new Set(allMaterials().map(m=>(m.c||'').trim()).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">All categories ('+allMaterials().length+')</option>'+cats.map(c=>'<option>'+escapeHtml(c)+'</option>').join('');
+  if(cats.includes(cur)) sel.value=cur;
 }
 function addMaterialNote(m){
   if (!state.pdfDoc){ setHint('Open a drawing first to add a note'); $('matBack').classList.remove('open'); return; }
@@ -4413,7 +4465,7 @@ function addMaterialNote(m){
 }
 let matPickCb=null;
 function pickMaterial(cb){ matPickCb=cb; openMaterials(); }
-function openMaterials(){ if(settings&&settings.uvEnabled===false) return; $('matBack').classList.add('open'); $('matSearch').value=''; $('matAddForm').style.display='none'; renderMatResults(); setTimeout(()=>$('matSearch').focus(),50); }
+function openMaterials(){ if(settings&&settings.uvEnabled===false) return; $('matBack').classList.add('open'); $('matSearch').value=''; $('matAddForm').style.display='none'; renderMatCats(); renderMatResults(); setTimeout(()=>$('matSearch').focus(),50); }
 
 /* ---------- Multi-select build-up workflow ---------- */
 function updateSelBar(){
@@ -4637,6 +4689,7 @@ function applyBuildupToTemplate(idx){
 $('btnMaterials') && $('btnMaterials').addEventListener('click',openMaterials);
 $('matSearch').addEventListener('input',renderMatResults);
 $('matClose').addEventListener('click',()=>{ if(document.body.classList.contains('mode-materials'))switchToPdf(); else $('matBack').classList.remove('open'); });
+$('matCatFilter') && $('matCatFilter').addEventListener('change',renderMatResults);
 function matImportInfoUpdate(){ const el=$('matImportInfo'); if(el) el.textContent = importedMaterials.length ? (importedMaterials.length+' imported materials loaded on this device.') : ''; }
 function importMaterialsFile(file){ const r=new FileReader(); r.onload=()=>{ try{ let d=JSON.parse(r.result); if(d&&!Array.isArray(d)&&Array.isArray(d.materials)) d=d.materials; if(!Array.isArray(d)) throw 0; const mapped=d.map(x=>{ const o={n:(x.n||x.name||'').trim(), l:+(x.l??x.lambda), c:x.c||x.category||'', aka:x.aka||x.aliases||[]}; const rho=+(x.rho??x.density), cp=+(x.cp??x.shc??x.c_p??x.specificHeat); if(rho>0)o.rho=rho; if(cp>0)o.cp=cp; return o; }).filter(x=>x.n&&x.l>0); if(!mapped.length) throw 0; importedMaterials=mapped; saveImportedMaterials(); matImportInfoUpdate(); renderMatResults(); setHint('Imported '+mapped.length+' materials into the \u03bb library.'); alert('Imported '+mapped.length+' materials. They are saved on this device and merged into the \u03bb lookup.'); }catch(e){ alert('That file is not a valid materials JSON.\n\nExpected an array like:\n[{"n":"Kingspan K109","l":0.018,"c":"Phenolic","aka":["k109"]}]'); } }; r.readAsText(file); }
 function exportMaterials(){ const lib=allMaterials().map(m=>{ const o={n:m.n,l:m.l,c:m.c||'',aka:m.aka||[]}; if(m.rho>0)o.rho=m.rho; if(m.cp>0)o.cp=m.cp; return o; }); download(new Blob([JSON.stringify(lib,null,2)],{type:'application/json'}),'ea-pdf-materials.json'); }
@@ -5284,7 +5337,7 @@ function switchToUval(){ if(settings&&settings.uvEnabled===false) return; if(!uv
 function switchToSplit(){ if(settings&&settings.uvEnabled===false) return; if(!uvUnlocked()){ flashDefineRegion(); setHint('Define a working space first — use the highlighted Detail region tool (E) to draw a box around the detail.'); return; } document.body.classList.remove('mode-uval','mode-hvac','mode-materials'); $('hvacBack').classList.remove('open'); $('matBack').classList.remove('open'); document.body.classList.add('mode-split'); setActiveMode('split'); openUval(); if(state.pdfDoc) setTimeout(fitWidth,40); }
 function switchToPdf(){ document.body.classList.remove('mode-uval','mode-split','mode-hvac','mode-materials'); $('uvalBack').classList.remove('open'); $('hvacBack').classList.remove('open'); $('matBack').classList.remove('open'); setActiveMode('pdf'); updateHintBox(); if(state.pdfDoc) setTimeout(fitWidth,40); }
 function switchToHvac(){ document.body.classList.remove('mode-uval','mode-split','mode-materials'); $('matBack').classList.remove('open'); document.body.classList.add('mode-hvac'); setActiveMode('hvac'); if(typeof hvacBuildFams==='function')hvacBuildFams(); if(typeof hvacRebuildFilters==='function')hvacRebuildFilters(); if(typeof renderHvac==='function')renderHvac(); $('hvacBack').classList.add('open'); setTimeout(()=>{var s=$('hvacSearch'); if(s)s.focus();},60); }
-function switchToMaterials(){ document.body.classList.remove('mode-uval','mode-split','mode-hvac'); $('hvacBack').classList.remove('open'); document.body.classList.add('mode-materials'); setActiveMode('materials'); $('matBack').classList.add('open'); if($('matSearch'))$('matSearch').value=''; if($('matAddForm'))$('matAddForm').style.display='none'; if(typeof renderMatResults==='function')renderMatResults(); setTimeout(()=>{var e=$('matSearch'); if(e)e.focus();},60); }
+function switchToMaterials(){ document.body.classList.remove('mode-uval','mode-split','mode-hvac'); $('hvacBack').classList.remove('open'); document.body.classList.add('mode-materials'); setActiveMode('materials'); $('matBack').classList.add('open'); if($('matSearch'))$('matSearch').value=''; if($('matAddForm'))$('matAddForm').style.display='none'; if(typeof renderMatCats==='function')renderMatCats(); if(typeof renderMatResults==='function')renderMatResults(); setTimeout(()=>{var e=$('matSearch'); if(e)e.focus();},60); }
 document.querySelectorAll('.ms-btn').forEach(b=>b.addEventListener('click',()=>{ const m=b.dataset.mode; if(m==='uval')switchToUval(); else if(m==='split')switchToSplit(); else if(m==='hvac')switchToHvac(); else if(m==='materials')switchToMaterials(); else switchToPdf(); }));
 // dock divider drag
 (function(){ let dd=false;
