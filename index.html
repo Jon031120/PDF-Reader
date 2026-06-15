@@ -260,7 +260,7 @@
   #modalBack,#pagesBack,#calBack,#wmBack,#scBack,#buBack,#setBack,#dimBack,#eaprojBack{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:100;}
   #modalBack.open,#pagesBack.open,#calBack.open,#wmBack.open,#scBack.open,#buBack.open,#setBack.open,#dimBack.open,#eaprojBack.open{display:flex;}
   #matBack{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:100;}
-  #matBack.open{display:flex;}
+  #matBack.open{display:flex;} body.mode-materials #matBack{position:fixed;inset:35px 0 0 0;background:var(--bg);align-items:stretch;justify-content:center;z-index:40} body.mode-materials #matModal{width:min(760px,100%);max-width:760px;max-height:100%;border:none;border-radius:0;margin:0 auto;box-shadow:none}
   /* U-value calculator */
   #uvalBack{position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; z-index:120;}
   #uvalBack.open{display:flex;}
@@ -577,6 +577,7 @@
   <button class="ms-btn" data-mode="uval">U-value &amp; Condensation</button>
   <button class="ms-btn" data-mode="split" title="PDF and U-value side by side">⬓ Split</button>
   <button class="ms-btn" id="msHvac" data-mode="hvac" title="HVAC systems lookup — heat pumps, boilers, ventilation, hot water">HVAC</button>
+  <button class="ms-btn" id="msMaterials" data-mode="materials" title="Material λ / thermal-property lookup">Materials</button>
   <span class="ms-lockmsg" id="msLock" style="display:none">Define a working space (a detail region) to unlock — press E or use the Detail region tool</span>
 </div>
 
@@ -1059,7 +1060,7 @@
 </div>
 
 <div id="hvacBack"><div id="hvacModal">
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><h2><em>HVAC</em> — systems &amp; equipment lookup <span style="font-size:10px;color:var(--text-dim);font-weight:400">build v68</span></h2><button id="hvacClose" style="background:none;border:none;color:var(--text-dim);font-size:22px;cursor:pointer;line-height:1">×</button></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><h2><em>HVAC</em> — systems &amp; equipment lookup <span style="font-size:10px;color:var(--text-dim);font-weight:400">build v69</span></h2><button id="hvacClose" style="background:none;border:none;color:var(--text-dim);font-size:22px;cursor:pointer;line-height:1">×</button></div>
   <div class="hvac-tabs" id="hvacTabs">
     <button class="hvac-tab active" data-group="all">All</button>
     <button class="hvac-tab" data-group="Heating">Heating</button>
@@ -4635,7 +4636,7 @@ function applyBuildupToTemplate(idx){
 }
 $('btnMaterials') && $('btnMaterials').addEventListener('click',openMaterials);
 $('matSearch').addEventListener('input',renderMatResults);
-$('matClose').addEventListener('click',()=>$('matBack').classList.remove('open'));
+$('matClose').addEventListener('click',()=>{ if(document.body.classList.contains('mode-materials'))switchToPdf(); else $('matBack').classList.remove('open'); });
 function matImportInfoUpdate(){ const el=$('matImportInfo'); if(el) el.textContent = importedMaterials.length ? (importedMaterials.length+' imported materials loaded on this device.') : ''; }
 function importMaterialsFile(file){ const r=new FileReader(); r.onload=()=>{ try{ let d=JSON.parse(r.result); if(d&&!Array.isArray(d)&&Array.isArray(d.materials)) d=d.materials; if(!Array.isArray(d)) throw 0; const mapped=d.map(x=>{ const o={n:(x.n||x.name||'').trim(), l:+(x.l??x.lambda), c:x.c||x.category||'', aka:x.aka||x.aliases||[]}; const rho=+(x.rho??x.density), cp=+(x.cp??x.shc??x.c_p??x.specificHeat); if(rho>0)o.rho=rho; if(cp>0)o.cp=cp; return o; }).filter(x=>x.n&&x.l>0); if(!mapped.length) throw 0; importedMaterials=mapped; saveImportedMaterials(); matImportInfoUpdate(); renderMatResults(); setHint('Imported '+mapped.length+' materials into the \u03bb library.'); alert('Imported '+mapped.length+' materials. They are saved on this device and merged into the \u03bb lookup.'); }catch(e){ alert('That file is not a valid materials JSON.\n\nExpected an array like:\n[{"n":"Kingspan K109","l":0.018,"c":"Phenolic","aka":["k109"]}]'); } }; r.readAsText(file); }
 function exportMaterials(){ const lib=allMaterials().map(m=>{ const o={n:m.n,l:m.l,c:m.c||'',aka:m.aka||[]}; if(m.rho>0)o.rho=m.rho; if(m.cp>0)o.cp=m.cp; return o; }); download(new Blob([JSON.stringify(lib,null,2)],{type:'application/json'}),'ea-pdf-materials.json'); }
@@ -4747,7 +4748,7 @@ $('hvacImport') && $('hvacImport').addEventListener('click',()=>$('hvacImportFil
 $('hvacImportFile') && $('hvacImportFile').addEventListener('change',e=>{ if(e.target.files[0]) importHvacFile(e.target.files[0]); e.target.value=''; });
 $('hvacExport') && $('hvacExport').addEventListener('click',exportHvac);
 loadHvac(); hvacBuildFams();
-$('matBack').addEventListener('click',e=>{ if(e.target.id==='matBack') $('matBack').classList.remove('open'); });
+$('matBack').addEventListener('click',e=>{ if(e.target.id==='matBack' && !document.body.classList.contains('mode-materials')) $('matBack').classList.remove('open'); });
 $('matAdd').addEventListener('click',()=>{
   const f=$('matAddForm'); f.style.display=f.style.display==='none'?'flex':'none';
   if (f.style.display==='flex'){ $('maName').value=$('matSearch').value.trim(); $('maLambda').value=''; $('maCat').value=''; if($('maRho'))$('maRho').value=''; if($('maCp'))$('maCp').value=''; $('maName').focus(); }
@@ -5279,11 +5280,12 @@ function updateModeLock(){
   $('msLock').style.display=u?'none':'inline';
 }
 function setActiveMode(m){ document.querySelectorAll('.ms-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===m)); }
-function switchToUval(){ if(settings&&settings.uvEnabled===false) return; if(!uvUnlocked()){ flashDefineRegion(); setHint('Define a working space first — use the highlighted Detail region tool (E) to draw a box around the detail.'); return; } document.body.classList.remove('mode-split','mode-hvac'); $('hvacBack').classList.remove('open'); document.body.classList.add('mode-uval'); setActiveMode('uval'); openUval(); }
-function switchToSplit(){ if(settings&&settings.uvEnabled===false) return; if(!uvUnlocked()){ flashDefineRegion(); setHint('Define a working space first — use the highlighted Detail region tool (E) to draw a box around the detail.'); return; } document.body.classList.remove('mode-uval','mode-hvac'); $('hvacBack').classList.remove('open'); document.body.classList.add('mode-split'); setActiveMode('split'); openUval(); if(state.pdfDoc) setTimeout(fitWidth,40); }
-function switchToPdf(){ document.body.classList.remove('mode-uval','mode-split','mode-hvac'); $('uvalBack').classList.remove('open'); $('hvacBack').classList.remove('open'); setActiveMode('pdf'); updateHintBox(); if(state.pdfDoc) setTimeout(fitWidth,40); }
-function switchToHvac(){ document.body.classList.remove('mode-uval','mode-split'); document.body.classList.add('mode-hvac'); setActiveMode('hvac'); if(typeof hvacBuildFams==='function')hvacBuildFams(); if(typeof hvacRebuildFilters==='function')hvacRebuildFilters(); if(typeof renderHvac==='function')renderHvac(); $('hvacBack').classList.add('open'); setTimeout(()=>{var s=$('hvacSearch'); if(s)s.focus();},60); }
-document.querySelectorAll('.ms-btn').forEach(b=>b.addEventListener('click',()=>{ const m=b.dataset.mode; if(m==='uval')switchToUval(); else if(m==='split')switchToSplit(); else if(m==='hvac')switchToHvac(); else switchToPdf(); }));
+function switchToUval(){ if(settings&&settings.uvEnabled===false) return; if(!uvUnlocked()){ flashDefineRegion(); setHint('Define a working space first — use the highlighted Detail region tool (E) to draw a box around the detail.'); return; } document.body.classList.remove('mode-split','mode-hvac','mode-materials'); $('hvacBack').classList.remove('open'); $('matBack').classList.remove('open'); document.body.classList.add('mode-uval'); setActiveMode('uval'); openUval(); }
+function switchToSplit(){ if(settings&&settings.uvEnabled===false) return; if(!uvUnlocked()){ flashDefineRegion(); setHint('Define a working space first — use the highlighted Detail region tool (E) to draw a box around the detail.'); return; } document.body.classList.remove('mode-uval','mode-hvac','mode-materials'); $('hvacBack').classList.remove('open'); $('matBack').classList.remove('open'); document.body.classList.add('mode-split'); setActiveMode('split'); openUval(); if(state.pdfDoc) setTimeout(fitWidth,40); }
+function switchToPdf(){ document.body.classList.remove('mode-uval','mode-split','mode-hvac','mode-materials'); $('uvalBack').classList.remove('open'); $('hvacBack').classList.remove('open'); $('matBack').classList.remove('open'); setActiveMode('pdf'); updateHintBox(); if(state.pdfDoc) setTimeout(fitWidth,40); }
+function switchToHvac(){ document.body.classList.remove('mode-uval','mode-split','mode-materials'); $('matBack').classList.remove('open'); document.body.classList.add('mode-hvac'); setActiveMode('hvac'); if(typeof hvacBuildFams==='function')hvacBuildFams(); if(typeof hvacRebuildFilters==='function')hvacRebuildFilters(); if(typeof renderHvac==='function')renderHvac(); $('hvacBack').classList.add('open'); setTimeout(()=>{var s=$('hvacSearch'); if(s)s.focus();},60); }
+function switchToMaterials(){ document.body.classList.remove('mode-uval','mode-split','mode-hvac'); $('hvacBack').classList.remove('open'); document.body.classList.add('mode-materials'); setActiveMode('materials'); $('matBack').classList.add('open'); if($('matSearch'))$('matSearch').value=''; if($('matAddForm'))$('matAddForm').style.display='none'; if(typeof renderMatResults==='function')renderMatResults(); setTimeout(()=>{var e=$('matSearch'); if(e)e.focus();},60); }
+document.querySelectorAll('.ms-btn').forEach(b=>b.addEventListener('click',()=>{ const m=b.dataset.mode; if(m==='uval')switchToUval(); else if(m==='split')switchToSplit(); else if(m==='hvac')switchToHvac(); else if(m==='materials')switchToMaterials(); else switchToPdf(); }));
 // dock divider drag
 (function(){ let dd=false;
   $('dockDivider').addEventListener('mousedown',e=>{ dd=true; e.preventDefault(); });
