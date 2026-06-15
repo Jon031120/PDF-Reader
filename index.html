@@ -1059,7 +1059,7 @@
 </div>
 
 <div id="hvacBack"><div id="hvacModal">
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><h2><em>HVAC</em> — systems &amp; equipment lookup <span style="font-size:10px;color:var(--text-dim);font-weight:400">build v67</span></h2><button id="hvacClose" style="background:none;border:none;color:var(--text-dim);font-size:22px;cursor:pointer;line-height:1">×</button></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><h2><em>HVAC</em> — systems &amp; equipment lookup <span style="font-size:10px;color:var(--text-dim);font-weight:400">build v68</span></h2><button id="hvacClose" style="background:none;border:none;color:var(--text-dim);font-size:22px;cursor:pointer;line-height:1">×</button></div>
   <div class="hvac-tabs" id="hvacTabs">
     <button class="hvac-tab active" data-group="all">All</button>
     <button class="hvac-tab" data-group="Heating">Heating</button>
@@ -1291,6 +1291,36 @@
 
 <input type="file" id="fileInput" accept=".pdf,.eapdf,.eaws,.brsproj,.brsws,application/pdf,image/*" multiple style="display:none">
 <input type="file" id="insertInput" accept=".pdf,application/pdf" style="display:none">
+
+<!-- Project: multiple elements + batch reports -->
+<div id="eaprojBack"><div id="eaprojModal">
+  <div class="ea-head"><h2><em>Project</em> — elements &amp; batch reports</h2><button id="eaprojClose" title="Close">×</button></div>
+  <div class="ea-meta">
+    <label>Project name<input id="eaName" type="text" placeholder="e.g. Plots 1–6, Elm Road"></label>
+    <label>Reference<input id="eaRef" type="text" placeholder="job / planning ref"></label>
+    <label>Client<input id="eaClient" type="text" placeholder="client / builder"></label>
+  </div>
+  <div class="ea-tools">
+    <button class="btn-sm" id="eaAdd" style="border-color:var(--green);color:var(--green)">＋ Add current element</button>
+    <button class="btn-sm" id="eaBatch" style="border-color:var(--green);color:var(--green)">🗎 Batch report ▸</button>
+    <span class="ea-count" id="eaCount">0 elements</span>
+  </div>
+  <div id="eaList" class="ea-list"></div>
+  <div class="ea-tools ea-tools2">
+    <button class="btn-sm" id="eaNew">New project</button>
+    <button class="btn-sm" id="eaOpenFile">Open project…</button>
+    <button class="btn-sm" id="eaSaveFile">Save project</button>
+    <button class="btn-sm" id="eaExportEl" title="Export the current calculator build-up as JSON">Export U-value JSON</button>
+    <button class="btn-sm" id="eaImportEl" title="Load a U-value build-up from JSON">Import U-value JSON</button>
+    <button class="btn-sm" id="eaFolder" title="Connect a projects folder (Chrome/Edge)">📁 Connect folder</button>
+  </div>
+  <div class="ea-tools" id="eaFolderRow" style="display:none">
+    <span style="color:var(--text-dim);font-size:12px">Projects folder:</span>
+    <select id="eaFolderList" style="flex:1;min-width:0"><option value="">— open from folder —</option></select>
+  </div>
+  <input type="file" id="eaOpenInput" accept=".eaproj,.json,application/json" style="display:none">
+  <input type="file" id="eaImportElInput" accept=".json,.eauv,application/json" style="display:none">
+</div></div>
 
 <script>
 /* ============================================================
@@ -6171,34 +6201,6 @@ if(typeof matImportInfoUpdate==='function') matImportInfoUpdate();
 try{ if(!localStorage.getItem(WELCOME_KEY)) setTimeout(openWelcome, 400); }catch(e){}
 eaInit();
 </script>
-<!-- Project: multiple elements + batch reports -->
-<div id="eaprojBack"><div id="eaprojModal">
-  <div class="ea-head"><h2><em>Project</em> — elements &amp; batch reports</h2><button id="eaprojClose" title="Close">×</button></div>
-  <div class="ea-meta">
-    <label>Project name<input id="eaName" type="text" placeholder="e.g. Plots 1–6, Elm Road"></label>
-    <label>Reference<input id="eaRef" type="text" placeholder="job / planning ref"></label>
-    <label>Client<input id="eaClient" type="text" placeholder="client / builder"></label>
-  </div>
-  <div class="ea-tools">
-    <button class="btn-sm" id="eaAdd" style="border-color:var(--green);color:var(--green)">＋ Add current element</button>
-    <button class="btn-sm" id="eaBatch" style="border-color:var(--green);color:var(--green)">🗎 Batch report ▸</button>
-    <span class="ea-count" id="eaCount">0 elements</span>
-  </div>
-  <div id="eaList" class="ea-list"></div>
-  <div class="ea-tools ea-tools2">
-    <button class="btn-sm" id="eaNew">New project</button>
-    <button class="btn-sm" id="eaOpenFile">Open project…</button>
-    <button class="btn-sm" id="eaSaveFile">Save project</button>
-    <button class="btn-sm" id="eaExportEl" title="Export the current calculator build-up as JSON">Export U-value JSON</button>
-    <button class="btn-sm" id="eaImportEl" title="Load a U-value build-up from JSON">Import U-value JSON</button>
-    <button class="btn-sm" id="eaFolder" title="Connect a projects folder (Chrome/Edge)">📁 Connect folder</button>
-  </div>
-  <div class="ea-tools" id="eaFolderRow" style="display:none">
-    <span style="color:var(--text-dim);font-size:12px">Projects folder:</span>
-    <select id="eaFolderList" style="flex:1;min-width:0"><option value="">— open from folder —</option></select>
-  </div>
-  <input type="file" id="eaOpenInput" accept=".eaproj,.json,application/json" style="display:none">
-  <input type="file" id="eaImportElInput" accept=".json,.eauv,application/json" style="display:none">
-</div></div>
+
 </body>
 </html>
