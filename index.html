@@ -1040,7 +1040,7 @@
 
 <div id="matBack">
   <div id="matModal">
-    <h2><em>Material λ</em> — thermal conductivity lookup <span style="font-size:10px;color:var(--text-dim);font-weight:400">build v71</span></h2>
+    <h2><em>Material λ</em> — thermal conductivity lookup <span style="font-size:10px;color:var(--text-dim);font-weight:400">build v72</span></h2>
     <input type="text" id="matSearch" placeholder="Search a product or material — e.g. Kingspan K103, EPS, blockwork…" autocomplete="off">
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex:0 0 auto"><select id="matCatFilter" style="flex:1;min-width:160px"><option value="">All categories</option></select><span id="matCount" style="font-size:11.5px;color:var(--text-dim)"></span></div>
     <div id="matResults"></div>
@@ -1061,7 +1061,7 @@
 </div>
 
 <div id="hvacBack"><div id="hvacModal">
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><h2><em>HVAC</em> — systems &amp; equipment lookup <span style="font-size:10px;color:var(--text-dim);font-weight:400">build v71</span></h2><button id="hvacClose" style="background:none;border:none;color:var(--text-dim);font-size:22px;cursor:pointer;line-height:1">×</button></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><h2><em>HVAC</em> — systems &amp; equipment lookup <span style="font-size:10px;color:var(--text-dim);font-weight:400">build v72</span></h2><button id="hvacClose" style="background:none;border:none;color:var(--text-dim);font-size:22px;cursor:pointer;line-height:1">×</button></div>
   <div class="hvac-tabs" id="hvacTabs">
     <button class="hvac-tab active" data-group="all">All</button>
     <button class="hvac-tab" data-group="Heating">Heating</button>
@@ -5327,10 +5327,11 @@ $('hintClose').addEventListener('click',()=>{ settings.hints=false; saveSettings
 $('btnHints').addEventListener('click',()=>{ settings.hints=settings.hints===false?true:false; saveSettings(); $('btnHints').classList.toggle('active', settings.hints!==false); if($('setHints')) $('setHints').checked=settings.hints!==false; updateHintBox(); });
 function updateModeLock(){
   const u=uvUnlocked();
-  const btnU=document.querySelector('.ms-btn[data-mode="uval"]'), btnS=document.querySelector('.ms-btn[data-mode="split"]');
-  btnU.classList.toggle('locked', !u); btnU.innerHTML=(u?'':'🔒 ')+'U-value &amp; Condensation';
-  btnS.classList.toggle('locked', !u);
-  $('msLock').style.display=u?'none':'inline';
+  const btnU=document.querySelector('.ms-btn[data-mode="uval"]'), btnS=document.querySelector('.ms-btn[data-mode="split"]'), btnSp=$('btnSplit');
+  if(btnU){ btnU.classList.toggle('locked', !u); btnU.innerHTML=(u?'':'🔒 ')+'U-value &amp; Condensation'; }
+  if(btnS) btnS.classList.toggle('locked', !u);
+  if(btnSp) btnSp.classList.toggle('locked', !u);
+  if($('msLock')) $('msLock').style.display=u?'none':'inline';
 }
 function setActiveMode(m){ document.querySelectorAll('.ms-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===m)); }
 function switchToUval(){ if(settings&&settings.uvEnabled===false) return; if(!uvUnlocked()){ flashDefineRegion(); setHint('Define a working space first — use the highlighted Detail region tool (E) to draw a box around the detail.'); return; } document.body.classList.remove('mode-hvac','mode-materials'); $('hvacBack').classList.remove('open'); $('matBack').classList.remove('open'); document.body.classList.add('mode-uval'); setActiveMode('uval'); openUval(); }

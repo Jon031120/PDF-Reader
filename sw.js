@@ -1,5 +1,5 @@
 /* EA PDF service worker — network-first for the app HTML, cache-first for libraries */
-const CACHE = 'ea-pdf-v71';
+const CACHE = 'ea-pdf-v72';
 const CORE = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './materials.json'];
 
 self.addEventListener('install', e => {
